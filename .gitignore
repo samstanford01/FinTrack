@@ -42,6 +42,11 @@ out/
 .DS_Store
 Thumbs.db
 
+# Cursor / local backups
+.cursor/
+.git.outer-backup/
+.preserve-backup.*/
+
 # Logs
 logs/
 *.log
