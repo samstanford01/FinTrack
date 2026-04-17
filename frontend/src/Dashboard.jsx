@@ -115,16 +115,16 @@ function Dashboard() {
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="p-4 rounded-xl bg-zinc-900/80 border border-zinc-800">
           <p className="text-sm text-zinc-400">Income</p>
-          <p className="text-2xl font-semibold text-accent-green">£{totalIncome.toFixed(2)}</p>
+          <p className="text-2xl font-semibold text-positive">↑ £{totalIncome.toFixed(2)}</p>
         </div>
         <div className="p-4 rounded-xl bg-zinc-900/80 border border-zinc-800">
           <p className="text-sm text-zinc-400">Spent</p>
-          <p className="text-2xl font-semibold text-red-400">£{totalSpent.toFixed(2)}</p>
+          <p className="text-2xl font-semibold text-negative">↓ £{totalSpent.toFixed(2)}</p>
         </div>
         <div className="p-4 rounded-xl bg-zinc-900/80 border border-zinc-800">
           <p className="text-sm text-zinc-400">Savings</p>
-          <p className={`text-2xl font-semibold ${savings >= 0 ? "text-accent-green" : "text-red-400"}`}>
-            £{savings.toFixed(2)}
+          <p className={`text-2xl font-semibold ${savings >= 0 ? "text-positive" : "text-negative"}`}>
+            {savings >= 0 ? "+" : "−"} £{Math.abs(savings).toFixed(2)}
           </p>
         </div>
       </div>

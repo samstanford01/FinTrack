@@ -2,9 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --accent: 124 108 252;
+  --accent-green: 79 209 165;
+  --app-bg: #0a0a0f;
+  --font-scale: 1;
+  --positive: 79 209 165;
+  --negative: 248 113 113;
+  --warning: 245 158 11;
+}
+
+html {
+  font-size: calc(16px * var(--font-scale));
+}
+
 body {
   margin: 0;
   min-height: 100vh;
-  background-color: #0a0a0f;
+  background-color: var(--app-bg);
   color: #e4e4e7;
 }

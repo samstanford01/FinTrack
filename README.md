@@ -40,6 +40,7 @@ pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
 ```
 
+<<<<<<< HEAD
 API docs available at: http://localhost:8000/docs
 
 Copy `.env.example` to `.env` and fill in any optional services:
@@ -55,6 +56,7 @@ cp .env.example .env
 | `TRUELAYER_CLIENT_ID` | Optional | Enables bank connection. Get free sandbox credentials at console.truelayer.com |
 | `TRUELAYER_CLIENT_SECRET` | Optional | As above |
 | `DATABASE_URL` | Optional | Defaults to `sqlite:///backend/fintrack.db` |
+| `DEV_MODE` | Optional | Set to `true` to enable **no-auth demo mode** when Firebase isn’t configured (do not enable on a server) |
 
 ### Frontend
 

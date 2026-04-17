@@ -3,6 +3,7 @@ FinBot: build user context from transactions and call OpenAI.
 Uses OPENAI_API_KEY; if missing, returns a placeholder so the app still works.
 """
 import os
+import logging
 from datetime import datetime
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -10,6 +11,7 @@ from sqlalchemy import func
 from models import Transaction, Budget
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+logger = logging.getLogger(__name__)
 
 
 def get_user_financial_context(db: Session, user_id: int):
@@ -75,4 +77,5 @@ def get_finbot_reply(user_message: str, context: str) -> str:
         )
         return (r.choices[0].message.content or "").strip()
     except Exception as e:
-        return f"Sorry, I couldn't process that right now. ({str(e)[:80]})"
+        logger.warning("FinBot request failed", exc_info=e)
+        return "Sorry, I couldn't process that right now. Please try again in a moment."

@@ -3,13 +3,20 @@ import Dashboard from "./Dashboard";
 import Assistant from "./Assistant";
 import Transactions from "./Transactions";
 import Achievements from "./Achievements";
+import Analytics from "./Analytics";
+import Rewards from "./Rewards.jsx";
+import Settings from "./Settings.jsx";
 import LoginPanel from "./Login";
 import { useAuth } from "./AuthContext";
+import { loadRewardsState, REWARD_TRACK } from "./rewards.js";
 
 const TABS = [
   { id: "dashboard", label: "Dashboard" },
   { id: "assistant", label: "AI Assistant" },
   { id: "transactions", label: "Transactions" },
+  { id: "analytics", label: "Analytics" },
+  { id: "rewards", label: "Rewards" },
+  { id: "settings", label: "Settings" },
   { id: "achievements", label: "Achievements" },
 ];
 
@@ -78,6 +85,23 @@ function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [bankCallbackStatus, setBankCallbackStatus] = useState(null);
   const { user, signOutUser, FIREBASE_ENABLED } = useAuth();
+  const [title, setTitle] = useState(() => {
+    const st = loadRewardsState();
+    if (!st.selectedTitleKey) return null;
+    return REWARD_TRACK.find((r) => r.key === st.selectedTitleKey)?.name || null;
+  });
+
+  useEffect(() => {
+    const onUpdate = () => {
+      const st = loadRewardsState();
+      const next = st.selectedTitleKey
+        ? (REWARD_TRACK.find((r) => r.key === st.selectedTitleKey)?.name || null)
+        : null;
+      setTitle(next);
+    };
+    window.addEventListener("fintrack_rewards_updated", onUpdate);
+    return () => window.removeEventListener("fintrack_rewards_updated", onUpdate);
+  }, []);
 
   // Dismiss the login panel automatically once the user signs in
   useEffect(() => {
@@ -126,7 +150,10 @@ function App() {
     <div className="min-h-screen bg-dark text-zinc-200 flex flex-col">
       <header className="border-b border-zinc-800 px-4 py-3 flex items-center gap-4">
         {/* Left: brand + tabs */}
-        <h1 className="text-xl font-semibold text-accent flex-shrink-0">FinTrack</h1>
+        <div className="flex items-baseline gap-2 flex-shrink-0">
+          <h1 className="text-xl font-semibold text-accent">FinTrack</h1>
+          {title && <span className="text-xs text-zinc-500 hidden sm:inline">· {title}</span>}
+        </div>
 
         <nav className="flex gap-1 flex-1" role="tablist">
           {TABS.map(({ id, label }) => (
@@ -190,6 +217,9 @@ function App() {
             {activeTab === "dashboard" && <Dashboard />}
             {activeTab === "assistant" && <Assistant />}
             {activeTab === "transactions" && <Transactions />}
+            {activeTab === "analytics" && <Analytics />}
+            {activeTab === "rewards" && <Rewards />}
+            {activeTab === "settings" && <Settings />}
             {activeTab === "achievements" && <Achievements />}
           </>
         )}

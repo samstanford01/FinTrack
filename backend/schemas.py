@@ -1,6 +1,6 @@
 """Pydantic schemas for API request/response."""
 from datetime import datetime
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 CATEGORIES = ["Food", "Transport", "Entertainment", "Rent", "Income"]
 
@@ -74,7 +74,7 @@ class BudgetResponse(BaseModel):
 
 
 class ChatRequest(BaseModel):
-    message: str
+    message: str = Field(min_length=1, max_length=2000)
 
 
 class ChatResponse(BaseModel):

@@ -46,4 +46,3 @@ This is for a **Cardiff University CM3202 Emerging Technologies** module group p
 - Real payment processing or bank integrations
 - Mobile app (web only)
 - Multi-currency support
-

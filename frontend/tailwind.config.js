@@ -8,8 +8,11 @@ export default {
     extend: {
       colors: {
         dark: "#0a0a0f",
-        accent: "#7c6cfc",
-        "accent-green": "#4fd1a5",
+        accent: "rgb(var(--accent) / <alpha-value>)",
+        "accent-green": "rgb(var(--accent-green) / <alpha-value>)",
+        positive: "rgb(var(--positive) / <alpha-value>)",
+        negative: "rgb(var(--negative) / <alpha-value>)",
+        warning: "rgb(var(--warning) / <alpha-value>)",
       },
     },
   },

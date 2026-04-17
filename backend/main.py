@@ -4,10 +4,13 @@ Run: uvicorn main:app --reload
 """
 from datetime import datetime, timedelta
 import logging
+import time
+from collections import defaultdict, deque
 from dotenv import load_dotenv
 load_dotenv()
-from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks
+from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from database import init_db, get_db
@@ -35,6 +38,37 @@ import firebase_sync as fs
 
 app = FastAPI(title="FinTrack API", version="0.2.0")
 
+# ---------------------------------------------------------------------------
+# Basic in-memory rate limiting (demo-friendly)
+# ---------------------------------------------------------------------------
+_RL_WINDOW_S = 60
+_RL_LIMIT_CHAT = 10
+_rl_hits: dict[tuple[str, str], deque] = defaultdict(deque)
+
+
+def _client_ip(request: Request) -> str:
+    # X-Forwarded-For not trusted in this localhost demo; keep it simple.
+    return getattr(request.client, "host", "unknown") if getattr(request, "client", None) else "unknown"
+
+
+@app.middleware("http")
+async def rate_limit_middleware(request: Request, call_next):
+    path = request.url.path
+    if path == "/chat":
+        key = (_client_ip(request), path)
+        now = time.time()
+        q = _rl_hits[key]
+        # drop old hits
+        while q and now - q[0] > _RL_WINDOW_S:
+            q.popleft()
+        if len(q) >= _RL_LIMIT_CHAT:
+            return JSONResponse(
+                status_code=429,
+                content={"detail": "Rate limit exceeded. Please wait and try again."},
+            )
+        q.append(now)
+    return await call_next(request)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -44,8 +78,8 @@ app.add_middleware(
         "http://127.0.0.1:5174",
     ],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type"],
 )
 
 
@@ -368,7 +402,8 @@ def bank_callback(
     try:
         tokens = exchange_code(data.code)
     except Exception as exc:
-        raise HTTPException(status_code=400, detail=f"Token exchange failed: {exc}")
+        logging.warning(f"Token exchange failed: {exc}")
+        raise HTTPException(status_code=400, detail="Token exchange failed")
 
     access_token = tokens["access_token"]
     refresh_tok = tokens.get("refresh_token")

@@ -24,6 +24,10 @@ ACCESS_TOKEN_EXPIRE_DAYS = 7
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer(auto_error=False)
 
+def _is_dev_mode() -> bool:
+    v = (os.environ.get("DEV_MODE") or "").strip().lower()
+    return v in {"1", "true", "yes", "y", "on"}
+
 
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
@@ -81,6 +85,12 @@ def get_firebase_user(
     from firebase_admin_init import is_firebase_enabled
 
     if not is_firebase_enabled():
+        if not _is_dev_mode():
+            # Safe-by-default: prevent accidentally running a shared-user mode on a server.
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Auth is not configured on this server (set DEV_MODE=true for local-only demo mode).",
+            )
         # No-auth fallback: single shared local user
         from default_user import get_default_user
         return get_default_user(db)

@@ -233,8 +233,11 @@ export default function Transactions() {
                   </td>
                   <td className="p-3">{t.category}</td>
                   <td className="p-3 text-zinc-400 max-w-[180px] truncate">{t.description || "—"}</td>
-                  <td className={`p-3 text-right font-medium ${t.amount >= 0 ? "text-accent-green" : "text-red-400"}`}>
-                    {t.amount >= 0 ? "+" : ""}£{Number(t.amount).toFixed(2)}
+                  <td className={`p-3 text-right font-medium ${t.amount >= 0 ? "text-positive" : "text-negative"}`}>
+                    <span className="text-xs opacity-80 mr-1" aria-hidden>
+                      {t.amount >= 0 ? "↑" : "↓"}
+                    </span>
+                    {t.amount >= 0 ? "+" : "−"}£{Math.abs(Number(t.amount)).toFixed(2)}
                   </td>
                   <td className="p-3">
                     <button
