@@ -1,0 +1,6 @@
+fintrack.db
+__pycache__/
+.env
+*.pyc
+.venv/
+venv/
